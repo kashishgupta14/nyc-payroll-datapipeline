@@ -37,7 +37,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/NYC_Payroll_DataPipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/NYC_Payroll_DataPipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -229,6 +229,51 @@
 							},
 							"traceLevel": "Fine"
 						}
+					},
+					{
+						"name": "DataFlow_Final",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "DataFlow_NYC_Payroll_Data_2020",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DataFlow_NYC_Payroll_Data_2021",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DataFlow_Final",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"source2": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
 					}
 				],
 				"policy": {
@@ -242,7 +287,8 @@
 				"[concat(variables('factoryId'), '/dataflows/DataFlow_NYC_Payroll_AgencyMaster')]",
 				"[concat(variables('factoryId'), '/dataflows/DataFlow_NYC_Payroll_EmpMaster')]",
 				"[concat(variables('factoryId'), '/dataflows/DataFlow_NYC_Payroll_Data_2020')]",
-				"[concat(variables('factoryId'), '/dataflows/DataFlow_NYC_Payroll_Data_2021')]"
+				"[concat(variables('factoryId'), '/dataflows/DataFlow_NYC_Payroll_Data_2021')]",
+				"[concat(variables('factoryId'), '/dataflows/DataFlow_Final')]"
 			]
 		},
 		{
